@@ -1,20 +1,19 @@
+# main/main.py (correct imports)
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import users,posts,auth,votes
-from main import database
-from .config import settings
+from main.routers import users, posts, auth, votes  # Absolute import
+from main.database import engine, SessionLocal, Base  # Import actual names
+from main.config import settings
 
-# # Create database tables
-# posts.models.Base.metadata.create_all(bind=database.engine)
+# Initialize tables (if needed)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-origins = ["*"]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = origins,
-    allow_credentials = True,
+    allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -24,6 +23,6 @@ app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(votes.router)
 
-app.get("/")
-def get():
-    return {"Hello": "World!!!"}
+@app.get("/")
+def root():
+    return {"message": "API is working!"}
